@@ -3,7 +3,6 @@
 
 #include "g_local.h"
 
-
 /*
 ===============================================================================
 
@@ -18,16 +17,18 @@ Touch_Button
 
 ===============
 */
-void Touch_Button(gentity_t* ent, gentity_t* other, trace_t* trace) {
-	if (!other->client) {
+void Touch_Button( gentity_t* ent, gentity_t* other, trace_t* trace )
+{
+	if( !other->client )
+	{
 		return;
 	}
 
-	if (ent->moverState == MOVER_POS1) {
-		Use_BinaryMover(ent, other, other);
+	if( ent->moverState == MOVER_POS1 )
+	{
+		Use_BinaryMover( ent, other, other );
 	}
 }
-
 
 /*QUAKED func_button (0 .5 .8) ?
 When a button is touched, it moves some distance in the direction of it's angle, triggers all of it's targets, waits some time, then returns to it's original position where it can be triggered again.
@@ -42,62 +43,67 @@ When a button is touched, it moves some distance in the direction of it's angle,
 "color"		constantLight color
 "light"		constantLight radius
 */
-void SP_func_button(gentity_t* ent) {
-	vec3_t		abs_movedir;
-	float		distance;
-	vec3_t		size;
-	float		lip;
+void SP_func_button( gentity_t* ent )
+{
+	vec3_t abs_movedir;
+	float  distance;
+	vec3_t size;
+	float  lip;
 
-	if (ent->sounds == 0)
+	if( ent->sounds == 0 )
 	{
-		ent->sound1to2 = G_SoundIndex("sound/buttons/airbut1.wav");
+		ent->sound1to2 = G_SoundIndex( "sound/buttons/airbut1.wav" );
 	}
-	if (ent->sounds == 1)
+	if( ent->sounds == 1 )
 	{
-		ent->sound1to2 = G_SoundIndex("sound/buttons/switch21.wav");
+		ent->sound1to2 = G_SoundIndex( "sound/buttons/switch21.wav" );
 	}
-	if (ent->sounds == 2)
+	if( ent->sounds == 2 )
 	{
-		ent->sound1to2 = G_SoundIndex("sound/buttons/switch02.wav");
+		ent->sound1to2 = G_SoundIndex( "sound/buttons/switch02.wav" );
 	}
-	if (ent->sounds == 3)
+	if( ent->sounds == 3 )
 	{
-		ent->sound1to2 = G_SoundIndex("sound/buttons/switch04.wav");
+		ent->sound1to2 = G_SoundIndex( "sound/buttons/switch04.wav" );
 	}
 
-	if (!ent->speed) {
+	if( !ent->speed )
+	{
 		ent->speed = 40;
 	}
 
-	if (!ent->wait) {
+	if( !ent->wait )
+	{
 		ent->wait = 1;
 	}
 	ent->wait *= 1000;
 
 	// first position
-	VectorCopy(ent->s.origin, ent->pos1);
+	VectorCopy( ent->s.origin, ent->pos1 );
 
 	// calculate second position
-	trap_SetBrushModel(ent, ent->model);
+	trap_SetBrushModel( ent, ent->model );
 
-	G_SpawnFloat("lip", "4", &lip);
+	G_SpawnFloat( "lip", "4", &lip );
 
-	G_SetMovedir(ent->s.angles, ent->movedir);
-	abs_movedir[0] = fabs(ent->movedir[0]);
-	abs_movedir[1] = fabs(ent->movedir[1]);
-	abs_movedir[2] = fabs(ent->movedir[2]);
-	VectorSubtract(ent->r.maxs, ent->r.mins, size);
-	distance = abs_movedir[0] * size[0] + abs_movedir[1] * size[1] + abs_movedir[2] * size[2] - lip;
-	VectorMA(ent->pos1, distance, ent->movedir, ent->pos2);
+	G_SetMovedir( ent->s.angles, ent->movedir );
+	abs_movedir[ 0 ] = fabs( ent->movedir[ 0 ] );
+	abs_movedir[ 1 ] = fabs( ent->movedir[ 1 ] );
+	abs_movedir[ 2 ] = fabs( ent->movedir[ 2 ] );
+	VectorSubtract( ent->r.maxs, ent->r.mins, size );
+	distance = abs_movedir[ 0 ] * size[ 0 ] + abs_movedir[ 1 ] * size[ 1 ] + abs_movedir[ 2 ] * size[ 2 ] - lip;
+	VectorMA( ent->pos1, distance, ent->movedir, ent->pos2 );
 
-	if (ent->health) {
+	if( ent->health )
+	{
 		// shootable button
 		ent->takedamage = qtrue;
 	}
-	else {
+	else
+	{
 		// touchable button
 		ent->touch = Touch_Button;
 	}
 
-	InitMover(ent);
+	InitMover( ent );
 }

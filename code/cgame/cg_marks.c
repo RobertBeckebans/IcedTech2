@@ -38,10 +38,9 @@ MARK POLYS
 ===================================================================
 */
 
-
-markPoly_t cg_activeMarkPolys;          // double linked list
-markPoly_t* cg_freeMarkPolys;          // single linked list
-markPoly_t cg_markPolys[MAX_MARK_POLYS];
+markPoly_t  cg_activeMarkPolys; // double linked list
+markPoly_t* cg_freeMarkPolys;   // single linked list
+markPoly_t  cg_markPolys[ MAX_MARK_POLYS ];
 
 /*
 ===================
@@ -50,30 +49,33 @@ CG_InitMarkPolys
 This is called at startup and for tournement restarts
 ===================
 */
-void    CG_InitMarkPolys(void) {
-	int i;
-	markPoly_t* trav, * lasttrav;
+void CG_InitMarkPolys( void )
+{
+	int         i;
+	markPoly_t *trav, *lasttrav;
 
-	memset(cg_markPolys, 0, sizeof(cg_markPolys));
+	memset( cg_markPolys, 0, sizeof( cg_markPolys ) );
 
 	cg_activeMarkPolys.nextMark = &cg_activeMarkPolys;
 	cg_activeMarkPolys.prevMark = &cg_activeMarkPolys;
-	cg_freeMarkPolys = cg_markPolys;
-	for (i = 0, trav = cg_markPolys + 1, lasttrav = cg_markPolys; i < MAX_MARK_POLYS - 1; i++, trav++) {
+	cg_freeMarkPolys            = cg_markPolys;
+	for( i = 0, trav = cg_markPolys + 1, lasttrav = cg_markPolys; i < MAX_MARK_POLYS - 1; i++, trav++ )
+	{
 		lasttrav->nextMark = trav;
-		lasttrav = trav;
+		lasttrav           = trav;
 	}
 }
-
 
 /*
 ==================
 CG_FreeMarkPoly
 ==================
 */
-void CG_FreeMarkPoly(markPoly_t* le) {
-	if (!le->prevMark) {
-		CG_Error("CG_FreeLocalEntity: not active");
+void CG_FreeMarkPoly( markPoly_t* le )
+{
+	if( !le->prevMark )
+	{
+		CG_Error( "CG_FreeLocalEntity: not active" );
 	}
 
 	// remove from the doubly linked active list
@@ -81,7 +83,7 @@ void CG_FreeMarkPoly(markPoly_t* le) {
 	le->nextMark->prevMark = le->prevMark;
 
 	// the free list is only singly linked
-	le->nextMark = cg_freeMarkPolys;
+	le->nextMark     = cg_freeMarkPolys;
 	cg_freeMarkPolys = le;
 }
 
@@ -92,23 +94,26 @@ CG_AllocMark
 Will allways succeed, even if it requires freeing an old active mark
 ===================
 */
-markPoly_t* CG_AllocMark(int endTime) {
+markPoly_t* CG_AllocMark( int endTime )
+{
 	markPoly_t* le; //, *trav, *lastTrav;
-	int time;
+	int         time;
 
-	if (!cg_freeMarkPolys) {
+	if( !cg_freeMarkPolys )
+	{
 		// no free entities, so free the one at the end of the chain
 		// remove the oldest active entity
 		time = cg_activeMarkPolys.prevMark->time;
-		while (cg_activeMarkPolys.prevMark && time == cg_activeMarkPolys.prevMark->time) {
-			CG_FreeMarkPoly(cg_activeMarkPolys.prevMark);
+		while( cg_activeMarkPolys.prevMark && time == cg_activeMarkPolys.prevMark->time )
+		{
+			CG_FreeMarkPoly( cg_activeMarkPolys.prevMark );
 		}
 	}
 
-	le = cg_freeMarkPolys;
+	le               = cg_freeMarkPolys;
 	cg_freeMarkPolys = cg_freeMarkPolys->nextMark;
 
-	memset(le, 0, sizeof(*le));
+	memset( le, 0, sizeof( *le ) );
 
 	// Ridah, TODO: sort this, so the list is always sorted by longest duration -> shortest duration,
 	// this way the shortest duration mark will always get overwritten first
@@ -117,14 +122,12 @@ markPoly_t* CG_AllocMark(int endTime) {
 	//}
 
 	// link into the active list
-	le->nextMark = cg_activeMarkPolys.nextMark;
-	le->prevMark = &cg_activeMarkPolys;
+	le->nextMark                          = cg_activeMarkPolys.nextMark;
+	le->prevMark                          = &cg_activeMarkPolys;
 	cg_activeMarkPolys.nextMark->prevMark = le;
-	cg_activeMarkPolys.nextMark = le;
+	cg_activeMarkPolys.nextMark           = le;
 	return le;
 }
-
-
 
 /*
 =================
@@ -138,19 +141,18 @@ passed to the renderer.
 =================
 */
 // Ridah, increased this since we leave them around for longer
-#define MAX_MARK_FRAGMENTS  384
-#define MAX_MARK_POINTS     1024
+#define MAX_MARK_FRAGMENTS 384
+#define MAX_MARK_POINTS    1024
 //#define	MAX_MARK_FRAGMENTS	128
 //#define	MAX_MARK_POINTS		384
 
 // these are ignored now for the most part
 //#define	MARK_TOTAL_TIME		20000	// (SA) made this a cvar: cg_markTime  (we could cap the time or remove marks quicker if too long a time starts to cause new marks to not appear)
-#define MARK_FADE_TIME      10000
+#define MARK_FADE_TIME 10000
 
-void CG_ImpactMark(qhandle_t markShader, const vec3_t origin, const vec3_t dir,
-	float orientation, float red, float green, float blue, float alpha,
-	qboolean alphaFade, float radius, qboolean temporary, int duration) {
-	vec3_t axis[3];
+void CG_ImpactMark( qhandle_t markShader, const vec3_t origin, const vec3_t dir, float orientation, float red, float green, float blue, float alpha, qboolean alphaFade, float radius, qboolean temporary, int duration )
+{
+	vec3_t axis[ 3 ];
 	//float texCoordScale;
 	//vec3_t originalPoints[4];
 	//byte colors[4];
@@ -266,48 +268,54 @@ void CG_ImpactMark(qhandle_t markShader, const vec3_t origin, const vec3_t dir,
 	//}
 }
 
-
 /*
 ===============
 CG_AddMarks
 ===============
 */
 
-void CG_AddMarks(void) {
-	int j;
-	markPoly_t* mp, * next;
-	int t;
-	int fade;
+void CG_AddMarks( void )
+{
+	int         j;
+	markPoly_t *mp, *next;
+	int         t;
+	int         fade;
 
 	//if (!cg_markTime.integer) {
 	//	return;
 	//}
 
 	mp = cg_activeMarkPolys.nextMark;
-	for (; mp != &cg_activeMarkPolys; mp = next) {
+	for( ; mp != &cg_activeMarkPolys; mp = next )
+	{
 		// grab next now, so if the local entity is freed we
 		// still have it
 		next = mp->nextMark;
 
 		// see if it is time to completely remove it
-		if (cg.time > mp->time + mp->duration) {
-			CG_FreeMarkPoly(mp);
+		if( cg.time > mp->time + mp->duration )
+		{
+			CG_FreeMarkPoly( mp );
 			continue;
 		}
 
 		// fade out the energy bursts
-		if (mp->markShader == cgs.media.energyMarkShader) {
-
-			fade = 450 - 450 * ((cg.time - mp->time) / 3000.0);
-			if (fade < 255) {
-				if (fade < 0) {
+		if( mp->markShader == cgs.media.energyMarkShader )
+		{
+			fade = 450 - 450 * ( ( cg.time - mp->time ) / 3000.0 );
+			if( fade < 255 )
+			{
+				if( fade < 0 )
+				{
 					fade = 0;
 				}
-				if (mp->verts[0].modulate[0] != 0) {
-					for (j = 0; j < mp->poly.numVerts; j++) {
-						mp->verts[j].modulate[0] = mp->color[0] * fade;
-						mp->verts[j].modulate[1] = mp->color[1] * fade;
-						mp->verts[j].modulate[2] = mp->color[2] * fade;
+				if( mp->verts[ 0 ].modulate[ 0 ] != 0 )
+				{
+					for( j = 0; j < mp->poly.numVerts; j++ )
+					{
+						mp->verts[ j ].modulate[ 0 ] = mp->color[ 0 ] * fade;
+						mp->verts[ j ].modulate[ 1 ] = mp->color[ 1 ] * fade;
+						mp->verts[ j ].modulate[ 2 ] = mp->color[ 2 ] * fade;
 					}
 				}
 			}
@@ -315,23 +323,27 @@ void CG_AddMarks(void) {
 
 		// fade all marks out with time
 		t = mp->time + mp->duration - cg.time;
-		if (t < (float)mp->duration / 2.0) {
-			fade = (int)(255.0 * (float)t / ((float)mp->duration / 2.0));
-			if (mp->alphaFade) {
-				for (j = 0; j < mp->poly.numVerts; j++) {
-					mp->verts[j].modulate[3] = fade;
+		if( t < ( float )mp->duration / 2.0 )
+		{
+			fade = ( int )( 255.0 * ( float )t / ( ( float )mp->duration / 2.0 ) );
+			if( mp->alphaFade )
+			{
+				for( j = 0; j < mp->poly.numVerts; j++ )
+				{
+					mp->verts[ j ].modulate[ 3 ] = fade;
 				}
 			}
-			else {
-				for (j = 0; j < mp->poly.numVerts; j++) {
-					mp->verts[j].modulate[0] = mp->color[0] * fade;
-					mp->verts[j].modulate[1] = mp->color[1] * fade;
-					mp->verts[j].modulate[2] = mp->color[2] * fade;
+			else
+			{
+				for( j = 0; j < mp->poly.numVerts; j++ )
+				{
+					mp->verts[ j ].modulate[ 0 ] = mp->color[ 0 ] * fade;
+					mp->verts[ j ].modulate[ 1 ] = mp->color[ 1 ] * fade;
+					mp->verts[ j ].modulate[ 2 ] = mp->color[ 2 ] * fade;
 				}
 			}
 		}
 
-		trap_R_AddPolyToScene(mp->markShader, mp->poly.numVerts, mp->verts);
+		trap_R_AddPolyToScene( mp->markShader, mp->poly.numVerts, mp->verts );
 	}
 }
-

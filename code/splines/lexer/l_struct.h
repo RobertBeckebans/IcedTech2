@@ -30,15 +30,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *****************************************************************************/
 
 //read a structure from a script
-int ReadStructure(source_t *source, structdef_t *def, char *structure);
+int ReadStructure( source_t* source, structdef_t* def, char* structure );
 
 //write a structure to a file
-int WriteStructure(FILE *fp, structdef_t *def, char *structure);
+int WriteStructure( FILE* fp, structdef_t* def, char* structure );
 
 //writes indents
-int WriteIndent(FILE *fp, int indent);
+int WriteIndent( FILE* fp, int indent );
 
 //writes a float without traling zeros
-int WriteFloat(FILE *fp, float value);
-
-
+int WriteFloat( FILE* fp, float value );

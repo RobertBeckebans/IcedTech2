@@ -29,18 +29,20 @@ If you have questions concerning this license or the applicable additional terms
 #ifndef __UI_PUBLIC_H__
 #define __UI_PUBLIC_H__
 
-#define UI_API_VERSION  4
+#define UI_API_VERSION 4
 
-typedef struct {
+typedef struct
+{
 	connstate_t connState;
-	int connectPacketCount;
-	int clientNum;
-	char servername[MAX_STRING_CHARS];
-	char updateInfoString[MAX_STRING_CHARS];
-	char messageString[MAX_STRING_CHARS];
+	int         connectPacketCount;
+	int         clientNum;
+	char        servername[ MAX_STRING_CHARS ];
+	char        updateInfoString[ MAX_STRING_CHARS ];
+	char        messageString[ MAX_STRING_CHARS ];
 } uiClientState_t;
 
-typedef enum {
+typedef enum
+{
 	UI_ERROR,
 	UI_PRINT,
 	UI_MILLISECONDS,
@@ -77,13 +79,13 @@ typedef enum {
 	UI_R_RENDERSCENE,
 	UI_R_SETCOLOR,
 	UI_R_DRAWSTRETCHPIC,
-	UI_UPDATESCREEN,        // 30
+	UI_UPDATESCREEN, // 30
 	UI_CM_LERPTAG,
 	UI_CM_LOADMODEL,
 	UI_S_REGISTERSOUND,
 	UI_S_STARTLOCALSOUND,
-	UI_S_FADESTREAMINGSOUND,    //----(SA)	added
-	UI_S_FADEALLSOUNDS,         //----(SA)	added
+	UI_S_FADESTREAMINGSOUND, //----(SA)	added
+	UI_S_FADEALLSOUNDS,      //----(SA)	added
 	UI_KEY_KEYNUMTOSTRINGBUF,
 	UI_KEY_GETBINDINGBUF,
 	UI_KEY_SETBINDING,
@@ -99,7 +101,7 @@ typedef enum {
 	UI_GETCONFIGSTRING,
 	UI_LAN_GETLOCALSERVERCOUNT,
 	UI_LAN_GETLOCALSERVERADDRESSSTRING,
-	UI_LAN_GETGLOBALSERVERCOUNT,        // 50
+	UI_LAN_GETGLOBALSERVERCOUNT, // 50
 	UI_LAN_GETGLOBALSERVERADDRESSSTRING,
 	UI_LAN_GETPINGQUEUECOUNT,
 	UI_LAN_CLEARPING,
@@ -142,7 +144,7 @@ typedef enum {
 	UI_LAN_GETSERVERPING,
 	UI_LAN_SERVERISVISIBLE,
 	UI_LAN_COMPARESERVERS,
-	UI_CL_GETLIMBOSTRING,           // NERVE - SMF
+	UI_CL_GETLIMBOSTRING, // NERVE - SMF
 
 	UI_MEMSET = 100,
 	UI_MEMCPY,
@@ -156,7 +158,8 @@ typedef enum {
 
 } uiImport_t;
 
-typedef enum {
+typedef enum
+{
 	UIMENU_NONE,
 	UIMENU_MAIN,
 	UIMENU_INGAME,
@@ -179,26 +182,26 @@ typedef enum {
 	UIMENU_BRIEFING         //----(SA)	added
 } uiMenuCommand_t;
 
-#define SORT_HOST           0
-#define SORT_MAP            1
-#define SORT_CLIENTS        2
-#define SORT_GAME           3
-#define SORT_PING           4
+#define SORT_HOST    0
+#define SORT_MAP     1
+#define SORT_CLIENTS 2
+#define SORT_GAME    3
+#define SORT_PING    4
 
-#define SORT_SAVENAME       0
-#define SORT_SAVETIME       1
+#define SORT_SAVENAME 0
+#define SORT_SAVETIME 1
 
-void _UI_Init(qboolean);
-void _UI_Shutdown(void);
-void _UI_KeyEvent(int key, qboolean down);
-void _UI_MouseEvent(int dx, int dy);
-void _UI_Refresh(int realtime);
-qboolean _UI_IsFullscreen(void);
-void _UI_SetActiveMenu(uiMenuCommand_t menu);
-uiMenuCommand_t _UI_GetActiveMenu(void);
-qboolean UI_ConsoleCommand(int realTime);
-void	UI_DrawConnectScreen(qboolean overlay);
+void            _UI_Init( qboolean );
+void            _UI_Shutdown( void );
+void            _UI_KeyEvent( int key, qboolean down );
+void            _UI_MouseEvent( int dx, int dy );
+void            _UI_Refresh( int realtime );
+qboolean        _UI_IsFullscreen( void );
+void            _UI_SetActiveMenu( uiMenuCommand_t menu );
+uiMenuCommand_t _UI_GetActiveMenu( void );
+qboolean        UI_ConsoleCommand( int realTime );
+void            UI_DrawConnectScreen( qboolean overlay );
 
-void UI_ForceActiveCustomMenu(const char* name);
+void UI_ForceActiveCustomMenu( const char* name );
 
 #endif

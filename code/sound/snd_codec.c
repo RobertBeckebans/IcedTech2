@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include "../client/client.h"
 #include "snd_codec.h"
 
-static snd_codec_t *codecs;
+static snd_codec_t* codecs;
 
 /*
 =================
@@ -34,19 +34,19 @@ Opens/loads a sound, tries codec based on the sound's file extension
 then tries all supported codecs.
 =================
 */
-static void *S_CodecGetSound(const char *filename, snd_info_t *info)
+static void* S_CodecGetSound( const char* filename, snd_info_t* info )
 {
-	snd_codec_t *codec;
-	snd_codec_t *orgCodec = NULL;
-	qboolean	orgNameFailed = qfalse;
-	char		localName[ MAX_QPATH ];
-	const char	*ext;
-	char		altName[ MAX_QPATH ];
-	void		*rtn = NULL;
+	snd_codec_t* codec;
+	snd_codec_t* orgCodec      = NULL;
+	qboolean     orgNameFailed = qfalse;
+	char         localName[ MAX_QPATH ];
+	const char*  ext;
+	char         altName[ MAX_QPATH ];
+	void*        rtn = NULL;
 
-	Q_strncpyz(localName, filename, MAX_QPATH);
+	Q_strncpyz( localName, filename, MAX_QPATH );
 
-	ext = COM_GetExtension(localName);
+	ext = COM_GetExtension( localName );
 
 	if( *ext )
 	{
@@ -57,9 +57,9 @@ static void *S_CodecGetSound(const char *filename, snd_info_t *info)
 			{
 				// Load
 				if( info )
-					rtn = codec->load(localName, info);
+					rtn = codec->load( localName, info );
 				else
-					rtn = codec->open(localName);
+					rtn = codec->open( localName );
 				break;
 			}
 		}
@@ -72,7 +72,7 @@ static void *S_CodecGetSound(const char *filename, snd_info_t *info)
 				// Loader failed, most likely because the file isn't there;
 				// try again without the extension
 				orgNameFailed = qtrue;
-				orgCodec = codec;
+				orgCodec      = codec;
 				COM_StripExtension( filename, localName, MAX_QPATH );
 			}
 			else
@@ -90,27 +90,28 @@ static void *S_CodecGetSound(const char *filename, snd_info_t *info)
 		if( codec == orgCodec )
 			continue;
 
-		Com_sprintf( altName, sizeof (altName), "%s.%s", localName, codec->ext );
+		Com_sprintf( altName, sizeof( altName ), "%s.%s", localName, codec->ext );
 
 		// Load
 		if( info )
-			rtn = codec->load(altName, info);
+			rtn = codec->load( altName, info );
 		else
-			rtn = codec->open(altName);
+			rtn = codec->open( altName );
 
 		if( rtn )
 		{
 			if( orgNameFailed )
 			{
-				Com_DPrintf(S_COLOR_YELLOW "WARNING: %s not present, using %s instead\n",
-						filename, altName );
+				Com_DPrintf( S_COLOR_YELLOW "WARNING: %s not present, using %s instead\n",
+					filename,
+					altName );
 			}
 
 			return rtn;
 		}
 	}
 
-//	Com_Printf(S_COLOR_YELLOW "WARNING: Failed to %s sound %s!\n", info ? "load" : "open", filename);
+	//	Com_Printf(S_COLOR_YELLOW "WARNING: Failed to %s sound %s!\n", info ? "load" : "open", filename);
 
 	return NULL;
 }
@@ -125,15 +126,15 @@ void S_CodecInit()
 	codecs = NULL;
 
 #ifdef USE_CODEC_OPUS
-  S_CodecRegister(&opus_codec);
+	S_CodecRegister( &opus_codec );
 #endif
 
 #ifdef USE_CODEC_VORBIS
-	S_CodecRegister(&ogg_codec);
+	S_CodecRegister( &ogg_codec );
 #endif
 
-// Register wav codec last so that it is always tried first when a file extension was not found
-	S_CodecRegister(&wav_codec);
+	// Register wav codec last so that it is always tried first when a file extension was not found
+	S_CodecRegister( &wav_codec );
 }
 
 /*
@@ -151,10 +152,10 @@ void S_CodecShutdown()
 S_CodecRegister
 =================
 */
-void S_CodecRegister(snd_codec_t *codec)
+void S_CodecRegister( snd_codec_t* codec )
 {
 	codec->next = codecs;
-	codecs = codec;
+	codecs      = codec;
 }
 
 /*
@@ -162,9 +163,9 @@ void S_CodecRegister(snd_codec_t *codec)
 S_CodecLoad
 =================
 */
-void *S_CodecLoad(const char *filename, snd_info_t *info)
+void* S_CodecLoad( const char* filename, snd_info_t* info )
 {
-	return S_CodecGetSound(filename, info);
+	return S_CodecGetSound( filename, info );
 }
 
 /*
@@ -172,19 +173,19 @@ void *S_CodecLoad(const char *filename, snd_info_t *info)
 S_CodecOpenStream
 =================
 */
-snd_stream_t *S_CodecOpenStream(const char *filename)
+snd_stream_t* S_CodecOpenStream( const char* filename )
 {
-	return S_CodecGetSound(filename, NULL);
+	return S_CodecGetSound( filename, NULL );
 }
 
-void S_CodecCloseStream(snd_stream_t *stream)
+void S_CodecCloseStream( snd_stream_t* stream )
 {
-	stream->codec->close(stream);
+	stream->codec->close( stream );
 }
 
-int S_CodecReadStream(snd_stream_t *stream, int bytes, void *buffer)
+int S_CodecReadStream( snd_stream_t* stream, int bytes, void* buffer )
 {
-	return stream->codec->read(stream, bytes, buffer);
+	return stream->codec->read( stream, bytes, buffer );
 }
 
 //=======================================================================
@@ -195,31 +196,31 @@ int S_CodecReadStream(snd_stream_t *stream, int bytes, void *buffer)
 S_CodecUtilOpen
 =================
 */
-snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
+snd_stream_t* S_CodecUtilOpen( const char* filename, snd_codec_t* codec )
 {
-	snd_stream_t *stream;
-	fileHandle_t hnd;
-	int length;
+	snd_stream_t* stream;
+	fileHandle_t  hnd;
+	int           length;
 
 	// Try to open the file
-	length = FS_FOpenFileRead(filename, &hnd, qtrue);
-	if(!hnd)
+	length = FS_FOpenFileRead( filename, &hnd, qtrue );
+	if( !hnd )
 	{
-		Com_DPrintf("Can't read sound file %s\n", filename);
+		Com_DPrintf( "Can't read sound file %s\n", filename );
 		return NULL;
 	}
 
 	// Allocate a stream
-	stream = Z_Malloc(sizeof(snd_stream_t));
-	if(!stream)
+	stream = Z_Malloc( sizeof( snd_stream_t ) );
+	if( !stream )
 	{
-		FS_FCloseFile(hnd);
+		FS_FCloseFile( hnd );
 		return NULL;
 	}
 
 	// Copy over, return
-	stream->codec = codec;
-	stream->file = hnd;
+	stream->codec  = codec;
+	stream->file   = hnd;
 	stream->length = length;
 	return stream;
 }
@@ -229,9 +230,9 @@ snd_stream_t *S_CodecUtilOpen(const char *filename, snd_codec_t *codec)
 S_CodecUtilClose
 =================
 */
-void S_CodecUtilClose(snd_stream_t **stream)
+void S_CodecUtilClose( snd_stream_t** stream )
 {
-	FS_FCloseFile((*stream)->file);
-	Z_Free(*stream);
+	FS_FCloseFile( ( *stream )->file );
+	Z_Free( *stream );
 	*stream = NULL;
 }

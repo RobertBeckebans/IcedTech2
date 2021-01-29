@@ -3,7 +3,6 @@
 
 #include "g_local.h"
 
-
 /*
 ==============================================================================
 
@@ -19,109 +18,104 @@ the player has been recently.  It is used by monsters for pursuit.
 .aiment		backward link
 */
 
+#define TRAIL_LENGTH 8
 
-#define	TRAIL_LENGTH	8
+gentity_t* trail[ TRAIL_LENGTH ];
+int        trail_head;
+qboolean   trail_active = qfalse;
 
-gentity_t* trail[TRAIL_LENGTH];
-int			trail_head;
-qboolean	trail_active = qfalse;
+#define NEXT( n ) ( ( ( n ) + 1 ) & ( TRAIL_LENGTH - 1 ) )
+#define PREV( n ) ( ( ( n )-1 ) & ( TRAIL_LENGTH - 1 ) )
 
-#define NEXT(n)		(((n) + 1) & (TRAIL_LENGTH - 1))
-#define PREV(n)		(((n) - 1) & (TRAIL_LENGTH - 1))
-
-
-void PlayerTrail_Init(void)
+void PlayerTrail_Init( void )
 {
-	int		n;
+	int n;
 
-	for (n = 0; n < TRAIL_LENGTH; n++)
+	for( n = 0; n < TRAIL_LENGTH; n++ )
 	{
-		trail[n] = G_Spawn();
-		trail[n]->classname = "player_trail";
+		trail[ n ]            = G_Spawn();
+		trail[ n ]->classname = "player_trail";
 	}
 
-	trail_head = 0;
+	trail_head   = 0;
 	trail_active = qtrue;
 }
 
-
-void PlayerTrail_Add(vec3_t spot)
+void PlayerTrail_Add( vec3_t spot )
 {
-	vec3_t	temp;
+	vec3_t temp;
 
-	if (!trail_active)
+	if( !trail_active )
 		return;
 
-	VectorCopy(spot, trail[trail_head]->r.currentOrigin);
+	VectorCopy( spot, trail[ trail_head ]->r.currentOrigin );
 
-	trail[trail_head]->timestamp = level.time;
+	trail[ trail_head ]->timestamp = level.time;
 
-	VectorSubtract(spot, trail[PREV(trail_head)]->r.currentOrigin, temp);
-	trail[trail_head]->s.angles[1] = vectoyaw(temp);
+	VectorSubtract( spot, trail[ PREV( trail_head ) ]->r.currentOrigin, temp );
+	trail[ trail_head ]->s.angles[ 1 ] = vectoyaw( temp );
 
-	trail_head = NEXT(trail_head);
+	trail_head = NEXT( trail_head );
 }
 
-
-void PlayerTrail_New(vec3_t spot)
+void PlayerTrail_New( vec3_t spot )
 {
-	if (!trail_active)
+	if( !trail_active )
 		return;
 
 	PlayerTrail_Init();
-	PlayerTrail_Add(spot);
+	PlayerTrail_Add( spot );
 }
 
-
-gentity_t* PlayerTrail_PickFirst(gentity_t* self)
+gentity_t* PlayerTrail_PickFirst( gentity_t* self )
 {
-	int		marker;
-	int		n;
+	int marker;
+	int n;
 
-	if (!trail_active)
+	if( !trail_active )
 		return NULL;
 
-	for (marker = trail_head, n = TRAIL_LENGTH; n; n--)
+	for( marker = trail_head, n = TRAIL_LENGTH; n; n-- )
 	{
-		if (trail[marker]->timestamp <= self->monsterinfo.trail_time)
-			marker = NEXT(marker);
+		if( trail[ marker ]->timestamp <= self->monsterinfo.trail_time )
+			marker = NEXT( marker );
 		else
 			break;
 	}
 
-	if (visible(self, trail[marker]))
+	if( visible( self, trail[ marker ] ) )
 	{
-		return trail[marker];
+		return trail[ marker ];
 	}
 
-	if (visible(self, trail[PREV(marker)]))
+	if( visible( self, trail[ PREV( marker ) ] ) )
 	{
-		return trail[PREV(marker)];
+		return trail[ PREV( marker ) ];
 	}
 
-	return trail[marker];
+	return trail[ marker ];
 }
 
-gentity_t* PlayerTrail_PickNext(gentity_t* self)
+gentity_t* PlayerTrail_PickNext( gentity_t* self )
 {
-	int		marker;
-	int		n;
+	int marker;
+	int n;
 
-	if (!trail_active)
+	if( !trail_active )
 		return NULL;
 
-	for (marker = trail_head, n = TRAIL_LENGTH; n; n--)
+	for( marker = trail_head, n = TRAIL_LENGTH; n; n-- )
 	{
-		if (trail[marker]->timestamp <= self->monsterinfo.trail_time)
-			marker = NEXT(marker);
+		if( trail[ marker ]->timestamp <= self->monsterinfo.trail_time )
+			marker = NEXT( marker );
 		else
 			break;
 	}
 
-	return trail[marker];
+	return trail[ marker ];
 }
 
-gentity_t* PlayerTrail_LastSpot(void)
+gentity_t* PlayerTrail_LastSpot( void )
 {
-	return trail[PREV(trail_head)];
+	return trail[ PREV( trail_head ) ];
 }
