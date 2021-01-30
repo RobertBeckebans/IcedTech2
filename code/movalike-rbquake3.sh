@@ -11,6 +11,7 @@ mkdir -p engine/null
 mkdir -p games/q3a
 
 mv jpeg-6 libs/jpeg
+mv AL libs/openal
 
 mv gameshared shared
 
@@ -18,7 +19,7 @@ mv qcommon engine/
 mv client engine/
 mv renderer engine/
 mv raytracing engine/
-mv sound/* engine/client/
+#mv sound/* engine/client/
 
 mv server engine/
 
